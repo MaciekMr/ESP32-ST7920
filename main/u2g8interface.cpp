@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <functional>
 #include "esp_log.h"
 #include "sdkconfig.h"
 
@@ -21,6 +21,7 @@ static spi_device_handle_t handle_spi;   // SPI handle.
 static i2c_cmd_handle_t handle_i2c;      // I2C handle.
 static u8g2_esp32_hal_t u8g2_esp32_hal;  // HAL state data.
 
+/*
 #define ESP_ERROR_CHECK(x)                   \
   do {                                       \
     esp_err_t rc = (x);                      \
@@ -29,6 +30,7 @@ static u8g2_esp32_hal_t u8g2_esp32_hal;  // HAL state data.
       assert(0 && #x);                       \
     }                                        \
   } while (0);
+  */
 
 /*
  * HAL callback function as prescribed by the U8G2 library.  This callback is
@@ -252,6 +254,8 @@ void set_u8g2_interface()
 {
 
     u8g2_t u8g2;
+    spi_handler spi(12, 10, 11, 32);
+    auto callback = std::bind(&spi_handler::u8g2_esp32_spi_byte_cb, &spi, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 
     u8g2_Setup_st7920_128x64_f(&u8g2, U8G2_R0, u8g2_esp32_spi_byte_cb, u8g2_esp32_gpio_and_delay_cb);  // init u8g2 structure)
 

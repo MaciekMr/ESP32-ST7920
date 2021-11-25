@@ -89,9 +89,28 @@ void app_main(void)
     lcd.clear(lcd_mode::text);
     
     lcd.put_text(text, 18);
-
+    lcd.clear(lcd_mode::text);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
     //ST7920_setGraphicMode(true);
-    //lcd.lcd_init(lcd_mode::grap);
+    
+    lcd.lcd_init(lcd_mode::grap);
+
+    lcd.clear(lcd_mode::grap);
+
+    int x_val;
+    for (uint8_t xbank = 0; xbank < 16; xbank++)
+    {
+        x_val = 0x8000;
+        for (uint8_t count = 0; count < 16; count++)
+        {
+            lcd.set_point(point{xbank, 0}, point{0, count}, x_val, x_val);
+            x_val = (x_val >> 1);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+            ESP_LOGI(TAG, "counter %d %d\n", count, x_val);
+       
+        }
+    }
+    //lcd.fill_GDRAM();
     //ST7920_ClearGraphicMem();
     //lcd.clear(lcd_mode::grap);
     // highlight title

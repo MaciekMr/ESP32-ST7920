@@ -106,7 +106,7 @@ esp_err_t spi_handler::spi_device_init(uint_fast32_t spi_clock, uint_least16_t d
     spi_interface.flags = SPI_DEVICE_HALFDUPLEX; // | SPI_DEVICE_POSITIVE_CS;
     spi_interface.pre_cb = cs_high_callback;
     spi_interface.post_cb = cs_low_callback;
-    spi_interface.input_delay_ns = LCD_INPUT_DELAY_NS; //delay_ns; //LCD_INPUT_DELAY_NS;
+    spi_interface.input_delay_ns = LCD_INPUT_DELAY_NS; //delay_ns; //LCD_INPUT_DELAY_NS;600ns
 
     esp_err_t ret = spi_bus_add_device(spi_host, &spi_interface, &spi_device);
     ESP_ERROR_CHECK(ret);
@@ -151,6 +151,7 @@ esp_err_t spi_handler::send_byte_spi(uint8_t mode, const uint8_t data)
     ret = spi_device_polling_transmit(spi_device, &t);  //Transmit!
     assert(ret==ESP_OK);
     ESP_LOGD(TAG,"data sent %d \n", ret);
+    //vTaskDelay(10 / portTICK_PERIOD_MS);
     return (ret);
 }
 

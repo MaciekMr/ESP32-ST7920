@@ -22,7 +22,8 @@ Please refer to Table 7 for Graphic Display RAM mapping.
 #define LCD_CLEAR_SCREEN        0x01    // Clear screen
 #define LCD_ADDRESS_RESET       0x02    // The address counter is reset
 #define LCD_BASIC_FUNCTION      0x30    // Basic instruction set
-#define LCD_EXTEND_FUNCTION     0x34    // Extended instruction set
+#define LCD_EXTEND_FUNCTION     0x30    // Extended instruction set with DL = 8 bits
+#define GRAPHIC_RAM_ADDRESS 0x80
 // #define write_ram     -> D7 - D0 - data set RS=1 RW=0
 
 //Extended instructions
