@@ -23,12 +23,16 @@
 #include "sdkconfig.h"
 #include "u8g2.h"
 #include "spi_handler.h"
+#include "basic_figures.h"
 #include "spi_interface.h"
+#include "timer_control.h"
 
 
 extern "C" {
 	void app_main(void);
 }
+
+static xQueueHandle s_timer_queue;
 
 void show_info()
 {
@@ -54,6 +58,10 @@ void show_info()
 void app_main(void)
 {
     show_info();
+
+    printf("Initialise queue \n");
+    s_timer_queue = xQueueCreate(10, sizeof(example_timer_event_t));
+    set_queue(s_timer_queue);
     //Reset ST7920
     /*gpio_set_level(LCD_PIN_NUM_RST, 0);
     vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -97,19 +105,113 @@ void app_main(void)
 
     lcd.clear(lcd_mode::grap);
 
-    int x_val;
-    for (uint8_t xbank = 0; xbank < 16; xbank++)
+    
+    //Set two linex in teh framebuffer
+    //draw two boxex
+    //poont(3,3) -> point (50,3)
+    //point(3,25) -> point (50,25)
+    printf("Before \n");
+    //lcd.show_frame_buff();
+    uint8_t point_idx;
+
+    /*lcd.set_point_f(point{3,3}, 1);
+
+    lcd.set_point_f(point{15,3}, 1);
+
+    lcd.set_point_f(point{18,3}, 1);
+    lcd.set_point_f(point{127,3}, 1);
+    */
+    uint8_t delta = 0;
+    for (uint8_t inside_box = 0; inside_box < 8; inside_box++)
     {
-        x_val = 0x8000;
-        for (uint8_t count = 0; count < 16; count++)
+        
+        for (point_idx = (2+delta); point_idx < (125 - delta); point_idx++)
         {
-            lcd.set_point(point{xbank, 0}, point{0, count}, x_val, x_val);
-            x_val = (x_val >> 1);
-            vTaskDelay(500 / portTICK_PERIOD_MS);
-            ESP_LOGI(TAG, "counter %d %d\n", count, x_val);
-       
+            //draw vertical line
+            lcd.set_point_f(point{point_idx, (uint8_t)(3+delta)}, 1);
+            lcd.set_point_f(point{point_idx, (uint8_t)(62-delta)}, 1);
         }
+        //printf("After \n");
+        //lcd.show_frame_buff();
+        
+        for (point_idx = 3+delta; point_idx <= 62-delta; point_idx ++)
+        {
+            //draw vertical line
+            lcd.set_point_f(point{(uint8_t)(2+delta), point_idx}, 1);
+            lcd.set_point_f(point{(uint8_t)(125-delta), point_idx}, 1);
+        }
+        delta += 4;
     }
+    printf("Timer is starting \n");
+    set_timer();
+    /*
+    for (point_idx = 2; point_idx < 125; point_idx++)
+    {
+        //draw vertical line
+        lcd.set_point_f(point{point_idx, 3}, 1);
+        lcd.set_point_f(point{point_idx, 62}, 1);
+    }
+    //printf("After \n");
+    //lcd.show_frame_buff();
+    
+    for (point_idx = 3; point_idx < 26; point_idx ++)
+    {
+        //draw vertical line
+        lcd.set_point_f(point{2, point_idx}, 1);
+        lcd.set_point_f(point{50, point_idx}, 1);
+    }
+    */
+    lcd.fill_GDRAM();
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+    //void show_counter();
+
+
+    while (1) {
+        example_timer_event_t evt;
+        xQueueReceive(s_timer_queue, &evt, portMAX_DELAY);
+
+        /* Print information that the timer reported an event */
+        if (evt.info.auto_reload) {
+            printf("Timer Group with auto reload\n");
+        } else {
+            printf("Timer Group without auto reload\n");
+        }
+        printf("Group[%d], timer[%d] alarm event\n", evt.info.timer_group, evt.info.timer_idx);
+
+        /* Print the timer values passed by event */
+        printf("------- EVENT TIME --------\n");
+        print_timer_counter(evt.timer_counter_value);
+
+        /* Print the timer values as visible by this task */
+        printf("-------- TASK TIME --------\n");
+        uint64_t task_counter_value;
+        timer_get_counter_value(evt.info.timer_group, evt.info.timer_idx, &task_counter_value);
+        print_timer_counter(task_counter_value);
+    }
+
+    /*int x_val = 0xFFFF;
+    for (uint8_t hor_pos = 0; hor_pos < 32; hor_pos++)
+    {
+        for (uint8_t xbank = 0; xbank < 16; xbank++)
+        {
+            lcd.set_segment_line(xbank, hor_pos, x_val);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+            ESP_LOGI(TAG, "counter hor_pos:%d xbank:%d\n", hor_pos, xbank);
+        }
+    }*/
+
+    /*
+        for (uint8_t xbank = 0; xbank < 16; xbank++)
+        {
+            x_val = 0xFFFF;
+            for (uint8_t count = 0; count < 32; count++)
+            {
+                lcd.set_point(point{xbank, count}, point{0, count}, count, x_val);
+                //x_val = (x_val >> 1);
+                vTaskDelay(500 / portTICK_PERIOD_MS);
+                ESP_LOGI(TAG, "counter %d %d\n", count, x_val);
+            }
+        }*/
     //lcd.fill_GDRAM();
     //ST7920_ClearGraphicMem();
     //lcd.clear(lcd_mode::grap);

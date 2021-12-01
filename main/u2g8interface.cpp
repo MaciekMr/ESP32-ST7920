@@ -11,6 +11,7 @@
 #include "driver/spi_master.h"
 #include "u8g2.h"
 #include "spi_handler.h"
+#include "basic_figures.h"
 #include "u2g8interface.h"
 
 

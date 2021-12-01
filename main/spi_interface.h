@@ -2,6 +2,7 @@
 #define LCD_X_SIZE      128
 #define LCD_Y_SIZE      64
 #define LCD_SEGMENTS    2
+#define LCD_SECTIONS    16 //LCD has 16 section each has 16 bits 
 #define LCD_DATA_WIDTH       16
 
 //ST7920 has 2 vertical segments 
@@ -21,10 +22,7 @@ enum lcd_mode
     grap = 1
 };
 
-struct point{
-    uint8_t x;
-    uint8_t y;
-};
+
 
 class LCD_ST7920
 {
@@ -64,5 +62,8 @@ public:
 
     void set_point_f(point, uint8_t);
 
+    void set_segment_line(uint8_t segment, uint8_t hor_pos, uint16_t value);
+
     void copy_ram_gram(); //copy framebuffer to display memory - executed when interrrupt running - add semaphore?
+    void show_frame_buff();
 };
