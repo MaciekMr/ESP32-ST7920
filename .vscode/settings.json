@@ -66,5 +66,11 @@
     "streambuf": "cpp",
     "thread": "cpp",
     "typeinfo": "cpp"
-  }
+  },
+  "idf.adapterTargetName": "esp32",
+  "idf.portWin": "COM3",
+  "idf.openOcdConfigs": [
+    "interface/ftdi/esp32_devkitj_v1.cfg",
+    "target/esp32.cfg"
+  ]
 }

@@ -4,10 +4,14 @@
 #include "freertos/task.h"
 #include "rom/ets_sys.h"
 #include "rom/gpio.h"
-
 #include <stddef.h>
 #include "esp_intr_alloc.h"
 #include "esp_attr.h"
+//#include "driver/gptimer.h"
+#include "esp_timer.h"
+#include "esp_log.h"
+#include "esp_sleep.h"
+#include "sdkconfig.h"
 #include "driver/timer.h"
 
 #define TIMER_COUNTER         16
@@ -16,8 +20,8 @@
 void set_queue(xQueueHandle queue);
 
 typedef struct {
-    timer_group_t timer_group;
-    timer_idx_t timer_idx;
+    int timer_group;
+    int timer_idx;
     int alarm_interval;
     bool auto_reload;
 } example_timer_info_t;

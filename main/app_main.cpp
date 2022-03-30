@@ -26,6 +26,7 @@
 #include "basic_figures.h"
 #include "spi_interface.h"
 #include "timer_control.h"
+#include "task.h"
 
 
 extern "C" {
@@ -58,8 +59,11 @@ void show_info()
 void app_main(void)
 {
     show_info();
+    printf("Initialise task \n");
+    //vAddTask();
+    start_thread();
 
-    printf("Initialise queue \n");
+        printf("Initialise queue \n");
     s_timer_queue = xQueueCreate(10, sizeof(example_timer_event_t));
     set_queue(s_timer_queue);
     //Reset ST7920
@@ -185,8 +189,8 @@ void app_main(void)
         /* Print the timer values as visible by this task */
         printf("-------- TASK TIME --------\n");
         uint64_t task_counter_value;
-        timer_get_counter_value(evt.info.timer_group, evt.info.timer_idx, &task_counter_value);
-        print_timer_counter(task_counter_value);
+        //timer_get_counter_value(evt.info.timer_group, evt.info.timer_idx, &task_counter_value);
+        print_timer_counter(evt.timer_counter_value); //task_counter_value);
     }
 
     /*int x_val = 0xFFFF;
